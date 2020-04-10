@@ -1,9 +1,9 @@
 QUESTION 1.  Read through the program lab9.bin. What do you expect the program to do? More specifically, which register will the program modify when it is run, and what will it contain when the program finishes? (You can probably figure this out merely by reading the comments provided in lab9.bin.)
 
-ANSWER: 
+ANSWER: The program will first clear register R2 and then add decimal number 12 to R2. R2 will contain decimal number 12(or x000C) when the program finishes.
 
 
 QUESTION 2.  Explain in a few sentences why the ability to step through a program (run one instruction at a time) is a very useful tool for debugging a program. Debugging is the process of finding and correcting bugs (or errors) in a program. Hint: Finding a bug is often much more difficult than correcting it.
 
-ANSWER: 
+ANSWER: By running one instruction at a time, we can look at the result after each step and figure out which step is not working as we expected. In this way, it is easier to find where the bug is and correct it. Therefore, the ability to step through a program is very useful for debugging a program.
 
