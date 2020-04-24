@@ -13,9 +13,9 @@
  
             .ORIG x3000               ; program starts at location x3000
  
+            LD    R0,ZERO             ; R0 contains 0
             LD    R1,INPUT            ; R1 contains input number
             LD    R2,NEGATIVE1        ; R2 contains -1
-			LD    R0,ZERO             ; R0 contains 0
             AND   R3,R3,#0            ; clear R3 by ANDing it with 0
             AND   R5,R5,#0            ; clear R5 by ANDing it with 0
             ADD   R3,R1,R2            ; R3 contains input number -1
