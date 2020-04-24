@@ -31,7 +31,7 @@ The cause of this error is program is missing .END.
 Question 2: For each label in the code, write down the corresponding memory location. 
 
 OUTERLOOP:   x3004
-INNEERLOOP:  x3005
+INNERLOOP:  x3005
 INPUT:       x300E
 RESULT:      x3011
 
