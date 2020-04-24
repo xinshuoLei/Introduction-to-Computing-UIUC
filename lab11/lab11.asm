@@ -15,8 +15,9 @@
  
             LD    R1,INPUT            ; R1 contains input number
             LD    R2,NEGATIVE1        ; R2 contains -1
+			LD    R0,ZERO             ; R0 contains 0
             AND   R3,R3,#0            ; clear R3 by ANDing it with 0
-            AND   R4,R4,#0            ; clear R4 by ANDing it with 0
+            AND   R5,R5,#0            ; clear R5 by ANDing it with 0
             ADD   R3,R1,R2            ; R3 contains input number -1
             ADD   R3,R3,R2            ; R3 contains input number -2
                                       ;   (initializes outer count)
