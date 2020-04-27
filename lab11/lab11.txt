@@ -1,9 +1,48 @@
 Question 1: Describe the errors that occur when trying to assemble lab11.asm. Identify the cause of each error.
 
+line 14:
+The error is illegal operand for missing opcode.
+The cause of this error is operand x3000 does not have an opcode(.ORIG in this case) before it.
+line 16:
+The error is instruction appears before .ORIG. 
+The cause of this error is the programs is missing .ORIG.
+line 17:
+The error is constant outside of allowed range. 
+The cause of this error is LD only allows a 9-bits offset, but the operand x3010 is 16 bits long.
+line 19:
+The error is illegal opearands for ADD.
+The cause of this error is the instruction contains an extra ',' after the first operand R3.
+line 30: 
+The error is constant outside of allowed range.
+The cause of this error is LD only allows a 9-bits offset, but the operand x30FF is 16 bits long.
+line 32:
+The error is label OUTERLOOP has already appeared. 
+The cause of this error is  branch opcode has zp in reverse order. BRpz cannot be understood by the assembler 
+so the assemlber thought OUTERLOOP indicates a label instead of an operand and gives an error. 
+line 35: 
+The error is label xxxx is not defined. 
+The cause of this error is label xxxx is not defined in the program so it cannot be used.The result should be
+instead stored in memory location specified by RESULT.
+line 41: 
+The error is no .END directive found.
+The cause of this error is program is missing .END.
 
 
 Question 2: For each label in the code, write down the corresponding memory location. 
 
+OUTERLOOP:   x3004
+INNERLOOP:  x3005
+INPUT:       x300E
+RESULT:      x3011
+
 
 
 Question 3: Between using labels and explicit memory locations/offsets, which one makes the most sense, and why?
+
+Using lables makes more sense. Labels are easier to read and write. We can quickly tell the location the instruction 
+is referring to by looking up corresponding labels. For memory location/offsets, we need to calculate 
+and count to get the address when reading or writing instructions. Also, memory locations/offsets need to be changed 
+if the code has been modified. But when using labels, the assembler will calculate the correct offset automatically, 
+which saves a lot of work.
+
+
