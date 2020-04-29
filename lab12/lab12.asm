@@ -9,7 +9,7 @@
 ; Xinshuo Lei 04/29/2020
 
 ; Table of registers:
-; R0 - starting address for PUT.
+; R0 - holds character that is going to be printed by OUT
 ; R1 - holds the bits in the line that is currently being printed.
 ; R2 - pointer that holds address of the line that is currently being printed.
 ; R3 - holds the character stored at address x5000, which need to be printed for every
