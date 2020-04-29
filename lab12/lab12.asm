@@ -1,3 +1,94 @@
+; Render a single ASCII character in a large (8x16-pixel) font to the monitor.
+; Each signle ASCII character is represented using 8 bits in each of 16
+; contiguous memory location. 
+; Font data starts at label FONT_DATA.
+; Render a single ASCII character by
+; printing character stored at address x5000 for every bit set to 0 in the font data and
+; printing character stored at address x5001 for every bit set to 1 in the font data.
+; Character that need to be printed is stored at address x5002
+; Xinshuo Lei 04/29/2020
+
+; Table of registers:
+; R0 - starting address for PUT.
+; R1 - holds the bits in the line that is currently being printed.
+; R2 - pointer that holds address of the line that is currently being printed.
+; R3 - holds the character stored at address x5000, which need to be printed for every
+;      bit set to 0 in the font data.
+;      also used as a counter to help set the correct starting address to R2
+;      during initialization.
+; R4 - holds the character stored at address x5001, which need to be printed for every
+;      bit set to 1 in the font data.
+; R5 - Row counter that counts 16 times. Keep track of how many lines are printed.
+; R6 - Column counter that counts 8 times. Keep track of how many bits in a line are printed. 
+
+
+                .ORIG x3000
+                AND   R2, R2, #0              ; clear R2 by ANDing it with 0
+                AND   R5, R5, #0              ; clear R5 by ANDing it with 0
+                LEA   R2, FONT_DATA           ; load the starting address of font table to R2
+                LDI   R3, INPUT_ADDRESS2      ; load character stored at x5002 to R3 
+                                              ; and use R3 as a counter for multiplication
+
+                ; start calculating starting address for character that need to be rendered         
+                ; starting address = R2+R3*16
+
+MULTIPLY        ADD   R2, R2, #8              ; add #8 to R2
+                ADD   R2, R2, #8              ; add #8 to R2
+                ADD   R3, R3, #-1             ; decrement counter R3
+                BRp   MULTIPLY                ; if positive, continue multiplication
+
+                                              ; if not positive (zero in this case), loop ends
+                                              ; and R2 has correct starting address.
+                 
+                ; start printing
+
+                LDI   R3, INPUT_ADDRESS0      ; load character stored at x5000 to R3
+                LDI   R4, INPUT_ADDRESS1      ; load character stored at x5001 to R4
+                ADD   R5, R5, #8              ; add #8 to R5
+                ADD   R5, R5, #8              ; initialize row counter R5 to #16
+NEXT_ROW        LDR   R1, R2, #0              ; load one line in font data using R2 as address
+                AND   R6, R6, #0              ; clear R6 by ANDing it with 0
+                ADD   R6, R6, #8              ; initialize column counter R6 to #8
+NEXT_COLUMN     AND   R0, R0, #0              ; clear R0 by ANDing it with 0
+                ADD   R1, R1, #0              ; set condition codes based on R1
+                BRn   PRINT1                  ; if negative, jump to PRINT1
+                ADD   R0, R0, R3              ; if non-negative, MSB is 0. so set R0 equal to R3,
+                                              ; which is character that need to be printed for 
+                                              ; bit set to 0
+                BRnzp PRINT                   ; jump to print when finish setting R0
+PRINT1          ADD   R0, R0, R4              ; if negative, MSB is 1. so set R0 equal to R4,
+                                              ; which is character that need to be printed for 
+                                              ; bit set to 1
+PRINT           OUT                           ; print
+                ADD   R1, R1, R1              ; left shift to read next column
+                ADD   R6, R6, #-1             ; decrement column counter R6
+                BRp   NEXT_COLUMN             ; if column counter is positive (not zero), check
+                                              ; next column
+                
+                                              ; if not positive (zero in this case), current row
+                                              ; ends and print single line feed
+
+                LD    R0, LINE_FEED           ; load line feed character to R0
+                OUT                           ; print
+                ADD   R2, R2, #1              ; increment R2 to point to address of next line
+                ADD   R5, R5, #-1             ; decrement row counter R5
+                BRp   NEXT_ROW                ; if row counter is positive (not zero), check
+                                              ; next row 
+                                              
+                                              ; if not positive (zero in this case), end program
+
+                HALT                          ; halt the program
+ 
+                
+
+INPUT_ADDRESS0  .FILL x5000
+INPUT_ADDRESS1  .FILL x5001
+INPUT_ADDRESS2  .FILL x5002
+LINE_FEED       .FILL x000A
+
+
+
+
 ; The table below represents an 8x16 font.  For each 8-bit extended ASCII
 ; character, the table uses 16 memory locations, each of which contains
 ; 8 bits (the high 8 bits, for your convenience) marking pixels in the
@@ -4100,3 +4191,8 @@ FONT_DATA
 	.FILL	x0000
 	.FILL	x0000
 	.FILL	x0000
+
+    .END
+
+
+
