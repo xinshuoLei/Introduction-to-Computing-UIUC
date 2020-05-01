@@ -22,51 +22,53 @@
 ; R6 - Column counter that counts 8 times. Keep track of how many bits in a line are printed. 
 
 
-                .ORIG x3000
+                .ORIG x3000                   ; programs starts at x3000
                 AND   R2, R2, #0              ; clear R2 by ANDing it with 0
                 AND   R5, R5, #0              ; clear R5 by ANDing it with 0
                 LEA   R2, FONT_DATA           ; load the starting address of font table to R2
                 LDI   R3, INPUT_ADDRESS2      ; load character stored at x5002 to R3 
                                               ; and use R3 as a counter for multiplication
 
-                ; start calculating starting address for character that need to be rendered         
-                ; starting address = R2+R3*16
+                ; start calculating starting address in font data for character that 
+                ; need to be rendered         
+                ; starting address in font data = R2+R3*16
+                ; multiples R3 by 16 via addition
 
 MULTIPLY        ADD   R2, R2, #8              ; add #8 to R2
                 ADD   R2, R2, #8              ; add #8 to R2
                 ADD   R3, R3, #-1             ; decrement counter R3
-                BRp   MULTIPLY                ; if positive, continue multiplication
+                BRp   MULTIPLY                ; if R3 is positive, continue multiplication
 
-                                              ; if not positive (zero in this case), loop ends
-                                              ; and R2 has correct starting address.
+                                              ; if R3 is not positive (zero in this case), loop 
+                                              ; ends and R2 has correct starting address.
                  
                 ; start printing
 
                 LDI   R3, INPUT_ADDRESS0      ; load character stored at x5000 to R3
                 LDI   R4, INPUT_ADDRESS1      ; load character stored at x5001 to R4
                 ADD   R5, R5, #8              ; add #8 to R5
-                ADD   R5, R5, #8              ; initialize row counter R5 to #16
+                ADD   R5, R5, #8              ; add #8 to R5. initialize row counter R5 to #16
 NEXT_ROW        LDR   R1, R2, #0              ; load one line in font data using R2 as address
                 AND   R6, R6, #0              ; clear R6 by ANDing it with 0
                 ADD   R6, R6, #8              ; initialize column counter R6 to #8
 NEXT_COLUMN     AND   R0, R0, #0              ; clear R0 by ANDing it with 0
                 ADD   R1, R1, #0              ; set condition codes based on R1
-                BRn   PRINT1                  ; if negative, jump to PRINT1
-                ADD   R0, R0, R3              ; if non-negative, MSB is 0. so set R0 equal to R3,
-                                              ; which is character that need to be printed for 
-                                              ; bit set to 0
+                BRn   PRINT1                  ; if R1 is negative, jump to PRINT1
+                ADD   R0, R0, R3              ; if R1 is non-negative, MSB is 0. so set R0 equal
+                                              ; to R3, which is character that need to be  
+                                              ; printed for bit set to 0
                 BRnzp PRINT                   ; jump to print when finish setting R0
-PRINT1          ADD   R0, R0, R4              ; if negative, MSB is 1. so set R0 equal to R4,
-                                              ; which is character that need to be printed for 
-                                              ; bit set to 1
+PRINT1          ADD   R0, R0, R4              ; if R1 is negative, MSB is 1. so set R0 equal 
+                                              ; to R4, which is character that need to be printed
+                                              ; for bit set to 1
 PRINT           OUT                           ; print
-                ADD   R1, R1, R1              ; left shift to read next column
+                ADD   R1, R1, R1              ; left shift R1 to read next column
                 ADD   R6, R6, #-1             ; decrement column counter R6
                 BRp   NEXT_COLUMN             ; if column counter is positive (not zero), check
                                               ; next column
                 
-                                              ; if not positive (zero in this case), current row
-                                              ; ends and print single line feed
+                                              ; if column counter is not positive (zero in this
+                                              ; case), current row ends and print single line feed
 
                 LD    R0, LINE_FEED           ; load line feed character to R0
                 OUT                           ; print
@@ -75,16 +77,17 @@ PRINT           OUT                           ; print
                 BRp   NEXT_ROW                ; if row counter is positive (not zero), check
                                               ; next row 
                                               
-                                              ; if not positive (zero in this case), end program
+                                              ; if row counter is not positive (zero in this 
+                                              ; case), end program
 
                 HALT                          ; halt the program
  
                 
 
-INPUT_ADDRESS0  .FILL x5000
-INPUT_ADDRESS1  .FILL x5001
-INPUT_ADDRESS2  .FILL x5002
-LINE_FEED       .FILL x000A
+INPUT_ADDRESS0  .FILL x5000                   ; address of the input at x5000
+INPUT_ADDRESS1  .FILL x5001                   ; address of the input at x5001
+INPUT_ADDRESS2  .FILL x5002                   ; address of the input at x5002
+LINE_FEED       .FILL x000A                   ; ASCII character single line feed
 
 
 
