@@ -27,12 +27,12 @@
                 ADD   R5, R5, #8              ; add #8 to R5
                 ADD   R5, R5, #8              ; add #8 to R5. initialize row counter R5 to #16
                 LDR   R1, R3, #0              ; load character using address stored at R3
-                BRz   STOP                    ; if first character is null, halt 
+                BRz   NULLSTRING              ; if first character is null, handle it differently 
 
                 ; start calculating starting address in font data for character that 
                 ; need to be rendered         
-                ; starting address in font data = R2+R3*16
-                ; multiples R3 by 16 via addition
+                ; starting address in font data = R2+R1*16
+                ; multiples R1 by 16 via addition
 
 CALCULATE       LEA   R2, FONT_DATA           ; load the starting address of font table to R2
 MULTIPLY        ADD   R2, R2, #8              ; add #8 to R2
@@ -84,7 +84,20 @@ PRINT           OUT                           ; print
                 OUT                           ; print
                 LDR   R1, R3, #0              ; load character into R1 using R3 as address
                 BRnzp CALCULATE               ; jump to multiply to calculate starting address of new line
-               
+ 
+
+                ; if the first character is null (that is the string is a null string), print 16 line feed
+                ; since each line needs to end with line feed and the solution contains 16 lines.
+                ; use R4 as a counter
+
+NULLSTRING      AND   R4, R4, #0              ; clear R4 by ANDing it with 0
+                ADD   R4, R4, #8              ; add #8 to R4
+                ADD   R4, R4, #8              ; add #8 to R4, initialize R4 to #16
+                LD    R0, LINE_FEED           ; load single line feed in to R0 
+PRINTLF         OUT                           ; print
+                ADD   R4, R4, #-1             ; decrement counter R4
+                BRp   PRINTLF                 ; if counter is positive, print line feed again
+                                              ; if counter is not positive (zero in this case), halt                         
 
 STOP            HALT                          ; halt the program
  
