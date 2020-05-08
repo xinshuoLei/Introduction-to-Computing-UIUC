@@ -40,7 +40,7 @@ MULTIPLY        ADD   R2, R2, #8              ; add #8 to R2
                 ADD   R1, R1, #-1             ; decrement counter R1
                 BRp   MULTIPLY                ; if R3 is positive, continue multiplication
                 ADD   R2, R2, R4              ; if R3 is not positive (zero in this case), loop 
-                                              ; ends, add R4 and R2 has correct starting address.
+                                              ; ends, add R4 to R2 and R2 has correct starting address.
                                               
                  
                 ; start printing
@@ -50,12 +50,12 @@ MULTIPLY        ADD   R2, R2, #8              ; add #8 to R2
 NEXT_COLUMN     ADD   R1, R1, #0              ; set condition codes based on R1
                 BRn   PRINT1                  ; if R1 is negative, jump to PRINT1
                 LDI   R0, INPUT_ADDRESS0      ; if R1 is non-negative, MSB is 0. so set R0 equal
-                                              ; to R3, which is character that need to be  
-                                              ; printed for bit set to 0
+                                              ; to character stored at x5000, which is character that  
+                                              ; need to be printed for bit set to 0
                 BRnzp PRINT                   ; jump to print when finish setting R0
 PRINT1          LDI   R0, INPUT_ADDRESS1      ; if R1 is negative, MSB is 1. so set R0 equal 
-                                              ; to R4, which is character that need to be printed
-                                              ; for bit set to 1
+                                              ; character stored at x5001, which is character that need 
+                                              ; to be printed for bit set to 1
 PRINT           OUT                           ; print
                 ADD   R1, R1, R1              ; left shift R1 to read next column
                 ADD   R6, R6, #-1             ; decrement column counter R6
@@ -65,7 +65,8 @@ PRINT           OUT                           ; print
                                               ; if column counter is not positive (zero in this
                                               ; case), check next character
                 
-                ADD   R3, R3, #1              ; increment R3 to check next character
+                ADD   R3, R3, #1              ; increment R3 to check next character that need to
+                                              ; be rendered
                 LDR   R1, R3, #0              ; load character into R1 using R3 as address
                 BRnp  CALCULATE               ; if character is not NULL, print next character
                 ADD   R5, R5, #-1             ; if character is NULL, decrement row counter
